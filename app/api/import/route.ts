@@ -495,8 +495,8 @@ function determineSessionType(exercises: ParsedExercise[]): {
       if (legKeywords.some((keyword) => nameToCheck.includes(keyword))) {
         legCount++
         if (nameToCheck.includes("cuádriceps") || nameToCheck.includes("extensión")) muscleTags.add("Cuádriceps")
-        if (nameToCheck.includes("peso muerto")) muscleTags.add("Isquiotibiales")
-        if (nameToCheck.includes("gemelos")) muscleTags.add("Pantorrillas")
+        if (nameToCheck.includes("peso muerto")) muscleTags.add("Femoral")
+        if (nameToCheck.includes("gemelos")) muscleTags.add("Gemelos")
         if (nameToCheck.includes("prensa") || nameToCheck.includes("sentadilla")) {
           muscleTags.add("Cuádriceps")
           muscleTags.add("Glúteos")

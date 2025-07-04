@@ -11,18 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useWorkoutEdit } from "@/hooks/use-workout-edit"
 
 const SESSION_TYPES = ["PUSH", "PULL", "LEG"] as const
-const MUSCLE_TAGS = [
-    "Pecho",
-    "Espalda",
-    "Hombros",
-    "Bíceps",
-    "Tríceps",
-    "Cuádriceps",
-    "Isquiotibiales",
-    "Glúteos",
-    "Pantorrillas",
-    "Core",
-]
+const MUSCLE_TAGS = ["Pecho", "Espalda", "Hombros", "Bíceps", "Tríceps", "Cuádriceps", "Femoral", "Glúteos", "Core"]
 
 interface EditWorkoutModalProps {
     open: boolean

@@ -45,7 +45,6 @@ export default function CalendarPage() {
     getWorkoutForDate,
     getWorkoutsForMonth,
     getRecentWorkouts,
-    getWorkoutIntensity,
   } = useCalendar()
 
   const getDaysInMonth = (date: Date) => {
@@ -80,14 +79,14 @@ export default function CalendarPage() {
   }
 
   const handleDateClick = (day: number) => {
-    const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day, 12, 0, 0) // Usar hora específica
+    const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day, 12, 0, 0)
     const dateString = selectedDate.toISOString().split("T")[0]
     router.push(`/day/${dateString}`)
   }
 
   const isToday = (day: number) => {
     const today = new Date()
-    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day, 12, 0, 0) // Usar hora específica
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day, 12, 0, 0)
     const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0)
     return checkDate.getTime() === todayDate.getTime()
   }
@@ -137,12 +136,12 @@ export default function CalendarPage() {
 
       {/* Stats Cards */}
       {calendarStats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4" />
-                Total Entrenamientos
+                Entrenamientos
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -181,7 +180,7 @@ export default function CalendarPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Promedio Semanal
+                Promedio
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -228,7 +227,7 @@ export default function CalendarPage() {
                         variant="ghost"
                         className={cn(
                           "w-full h-full p-1 relative flex flex-col items-center justify-center",
-                          isToday(day) && "bg-primary text-primary-foreground hover:bg-primary/90",
+                          isToday(day) && "border-primary border-2 text-secondary-foreground hover:bg-primary/90",
                           getWorkoutForDay(day) && !isToday(day) && "bg-secondary hover:bg-secondary/80",
                         )}
                         onClick={() => handleDateClick(day)}
@@ -242,9 +241,6 @@ export default function CalendarPage() {
                                 SESSION_TYPE_COLORS[getWorkoutForDay(day)!.session_type],
                               )}
                             />
-                            {getWorkoutIntensity(getWorkoutForDay(day)!) === "high" && (
-                              <div className="w-1 h-1 bg-orange-500 rounded-full" />
-                            )}
                           </div>
                         )}
                       </Button>
@@ -256,7 +252,7 @@ export default function CalendarPage() {
               {/* Legend */}
               <div className="flex flex-wrap items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
+                  <div className="w-3 h-3 rounded-full border-primary border-2"></div>
                   <span>Hoy</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -270,10 +266,6 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   <span>LEG</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-1 bg-orange-500 rounded-full"></div>
-                  <span>Alta intensidad</span>
                 </div>
               </div>
             </CardContent>

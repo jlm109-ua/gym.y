@@ -431,15 +431,14 @@ export default function SettingsPage() {
                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex-column items-center gap-2">
                             {exercise.sessionTypes.map((type) => (
                               <div
                                 key={type}
-                                className={`w-3 h-3 rounded-full ${SESSION_TYPE_COLORS[type as keyof typeof SESSION_TYPE_COLORS]}`}
+                                className={`w-3 h-3 mb-1 mt-1 rounded-full ${SESSION_TYPE_COLORS[type as keyof typeof SESSION_TYPE_COLORS]}`}
                               />
                             ))}
                           </div>
-                          {exercise.is_linked_to_previous && <Zap className="h-3 w-3 text-orange-500" />}
                           <div className="flex-1">
                             <div className="font-medium">{exercise.name}</div>
                             <div className="text-sm text-muted-foreground flex items-center gap-3">
@@ -460,18 +459,6 @@ export default function SettingsPage() {
                                 </span>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {exercise.sessionTypes.map((type) => (
-                              <Badge key={type} variant="outline" className="text-xs">
-                                {type}
-                              </Badge>
-                            ))}
-                            {exercise.is_linked_to_previous && (
-                              <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
-                                Superserie
-                              </Badge>
-                            )}
                           </div>
                         </div>
                         <div className="flex gap-1 ml-4">
@@ -521,11 +508,11 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Versión:</span>
-                  <span>1.0.0</span>
+                  <span>1.0.1</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Última actualización:</span>
-                  <span>Enero 2024</span>
+                  <span>Julio 2025</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Desarrollado con:</span>

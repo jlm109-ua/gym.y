@@ -46,7 +46,7 @@ export function useCalendar() {
           session_type,
           muscle_tags,
           exercises(id, sets, is_linked_to_previous)
-        `) // ✅ Incluir is_linked_to_previous
+        `)
                 .eq("user_id", DEFAULT_USER_ID)
                 .order("date", { ascending: true })
 
@@ -95,7 +95,7 @@ export function useCalendar() {
         const now = new Date()
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
-        // Sort workouts by date - usar hora específica para evitar problemas de zona horaria
+        // Sort workouts by date
         const sortedWorkouts = [...workouts].sort(
             (a, b) => new Date(a.date + "T12:00:00").getTime() - new Date(b.date + "T12:00:00").getTime(),
         )
@@ -122,7 +122,7 @@ export function useCalendar() {
         // Calculate longest streak
         let lastDate: Date | null = null
         for (const workout of sortedWorkouts) {
-            const currentDate = new Date(workout.date + "T12:00:00") // Usar hora específica
+            const currentDate = new Date(workout.date + "T12:00:00")
 
             if (lastDate && currentDate.getTime() - lastDate.getTime() <= 24 * 60 * 60 * 1000 * 2) {
                 // Within 2 days (allowing for rest days)
@@ -138,14 +138,14 @@ export function useCalendar() {
 
         // Workouts this month
         const workoutsThisMonth = workouts.filter((w) => {
-            const workoutDate = new Date(w.date + "T12:00:00") // Usar hora específica
+            const workoutDate = new Date(w.date + "T12:00:00")
             return workoutDate >= startOfMonth
         }).length
 
         // Average workouts per week (last 4 weeks)
         const fourWeeksAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 28)
         const recentWorkouts = workouts.filter((w) => {
-            const workoutDate = new Date(w.date + "T12:00:00") // Usar hora específica
+            const workoutDate = new Date(w.date + "T12:00:00")
             return workoutDate >= fourWeeksAgo
         }).length
         const averageWorkoutsPerWeek = recentWorkouts / 4
@@ -169,7 +169,7 @@ export function useCalendar() {
 
     const getWorkoutsForMonth = (year: number, month: number): WorkoutDay[] => {
         return workoutDays.filter((workout) => {
-            const workoutDate = new Date(workout.date + "T12:00:00") // Usar hora específica
+            const workoutDate = new Date(workout.date + "T12:00:00")
             return workoutDate.getFullYear() === year && workoutDate.getMonth() === month
         })
     }
@@ -186,12 +186,6 @@ export function useCalendar() {
         return [...workoutDays].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, limit)
     }
 
-    const getWorkoutIntensity = (workout: WorkoutDay): "low" | "medium" | "high" => {
-        if (workout.total_sets >= 20) return "high"
-        if (workout.total_sets >= 12) return "medium"
-        return "low"
-    }
-
     return {
         workoutDays,
         calendarStats,
@@ -204,6 +198,5 @@ export function useCalendar() {
         getWorkoutsForMonth,
         getWorkoutsByType,
         getRecentWorkouts,
-        getWorkoutIntensity,
     }
 }

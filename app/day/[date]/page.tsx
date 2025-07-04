@@ -214,7 +214,7 @@ export default function DayPage() {
         <Card
           className={cn(
             "transition-all duration-200 cursor-move",
-            (inSuperset || isLinked || isNextLinked) && "border-orange-400 bg-orange-50/50 border-2",
+            (inSuperset || isLinked || isNextLinked) && "border-orange-400 bg-secondary border-2",
             isDragging && "opacity-50 scale-95",
             isDragOver && "border-primary border-2 bg-primary/5",
             reorderLoading && "pointer-events-none opacity-75",
@@ -234,11 +234,6 @@ export default function DayPage() {
                 <CardTitle className={cn("text-lg", (inSuperset || isLinked || isNextLinked) && "text-orange-700")}>
                   {exercise.name}
                 </CardTitle>
-                {(inSuperset || isLinked || isNextLinked) && (
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
-                    Superserie
-                  </Badge>
-                )}
               </div>
               <div className="flex gap-1">
                 {canLink && (

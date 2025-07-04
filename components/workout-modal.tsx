@@ -11,18 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DEFAULT_USER_ID } from "@/lib/supabase"
 
 const SESSION_TYPES = ["PUSH", "PULL", "LEG"] as const
-const MUSCLE_TAGS = [
-  "Pecho",
-  "Espalda",
-  "Hombros",
-  "Bíceps",
-  "Tríceps",
-  "Cuádriceps",
-  "Isquiotibiales",
-  "Glúteos",
-  "Pantorrillas",
-  "Core",
-]
+const MUSCLE_TAGS = ["Pecho", "Espalda", "Hombros", "Bíceps", "Tríceps", "Cuádriceps", "Femoral", "Glúteos", "Core"]
 
 interface WorkoutModalProps {
   open: boolean
