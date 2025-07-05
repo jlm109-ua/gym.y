@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Clock, TrendingUp } from "lucide-react"
+import { Clock, TrendingUp, Search } from "lucide-react"
 import { useExercises } from "@/hooks/use-exercises"
 import { useExerciseHistory } from "@/hooks/use-exercise-history"
 
@@ -34,9 +34,13 @@ export function ExerciseModal({ open, onOpenChange, workoutId, sessionType, exer
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
   const [inputMethod, setInputMethod] = useState<"manual" | "history">("manual")
+  const [searchTerm, setSearchTerm] = useState("")
 
   const { createExercise, updateExercise } = useExercises()
-  const { exercises: exerciseHistory, loading: historyLoading } = useExerciseHistory(sessionType)
+  const { exercises: exerciseHistory = [], loading: historyLoading } = useExerciseHistory(sessionType)
+
+  // Filter exercise history based on search term
+  const filteredHistory = exerciseHistory.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   useEffect(() => {
     if (exercise) {
@@ -176,11 +180,22 @@ export function ExerciseModal({ open, onOpenChange, workoutId, sessionType, exer
 
                 <TabsContent value="history" className="mt-2">
                   <div className="space-y-2">
+                    {/* Search within history */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder={`Buscar en historial ${sessionType}...`}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
                     {historyLoading ? (
                       <div className="text-center py-4 text-sm text-muted-foreground">Cargando historial...</div>
-                    ) : exerciseHistory.length > 0 ? (
+                    ) : filteredHistory.length > 0 ? (
                       <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {exerciseHistory.map((item, index) => (
+                        {filteredHistory.map((item, index) => (
                           <Card
                             key={index}
                             className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -215,7 +230,9 @@ export function ExerciseModal({ open, onOpenChange, workoutId, sessionType, exer
                       </div>
                     ) : (
                       <div className="text-center py-4 text-sm text-muted-foreground">
-                        No hay ejercicios previos de {sessionType}
+                        {searchTerm
+                          ? `No se encontraron ejercicios que coincidan con "${searchTerm}"`
+                          : `No hay ejercicios previos de ${sessionType}`}
                       </div>
                     )}
 

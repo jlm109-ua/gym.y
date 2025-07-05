@@ -70,29 +70,29 @@ export interface Database {
           created_at?: string
         }
       }
-      progress: {
+      physical_progress: {
         Row: {
           id: string
           user_id: string
           date: string
-          weight_kg: number | null
-          height_cm: number | null
+          weight: number | null
+          height: number | null
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
           date: string
-          weight_kg?: number | null
-          height_cm?: number | null
+          weight?: number | null
+          height?: number | null
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           date?: string
-          weight_kg?: number | null
-          height_cm?: number | null
+          weight?: number | null
+          height?: number | null
           created_at?: string
         }
       }
@@ -146,5 +146,5 @@ export interface Database {
   }
 }
 
-// Constante para el usuario único
+// Constante para el usuario único (UUID válido)
 export const DEFAULT_USER_ID = "550e8400-e29b-41d4-a716-446655440000"

@@ -30,13 +30,16 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { ImportModal } from "@/components/import-modal"
 import { useAllExercises } from "@/hooks/use-all-exercises"
+import { supabase } from "@/lib/supabase"
+import { DEFAULT_USER_ID } from "@/lib/constants"
+import { generateWorkoutsPDF } from "@/lib/pdf-generator"
 
 const COLORS = [
-  { name: "Azul", value: "blue", class: "bg-blue-500" },
-  { name: "Rojo", value: "red", class: "bg-red-500" },
-  { name: "Verde", value: "green", class: "bg-green-500" },
-  { name: "Púrpura", value: "purple", class: "bg-purple-500" },
-  { name: "Naranja", value: "orange", class: "bg-orange-500" },
+  { name: "Azul", value: "blue", class: "bg-blue-500", hsl: "221.2 83.2% 53.3%" },
+  { name: "Rojo", value: "red", class: "bg-red-500", hsl: "0 84.2% 60.2%" },
+  { name: "Verde", value: "green", class: "bg-green-500", hsl: "142.1 76.2% 36.3%" },
+  { name: "Púrpura", value: "purple", class: "bg-purple-500", hsl: "262.1 83.3% 57.8%" },
+  { name: "Naranja", value: "orange", class: "bg-orange-500", hsl: "24.6 95% 53.1%" },
 ]
 
 const SESSION_TYPE_COLORS = {
@@ -69,28 +72,26 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setMounted(true)
-    // Load saved color from localStorage
+    // Load saved color from localStorage and apply it
     const savedColor = localStorage.getItem("primaryColor")
-    if (savedColor) {
+    if (savedColor && COLORS.find((c) => c.value === savedColor)) {
       setPrimaryColor(savedColor)
+      applyColorToCSS(savedColor)
     }
   }, [])
+
+  const applyColorToCSS = (color: string) => {
+    const colorConfig = COLORS.find((c) => c.value === color)
+    if (colorConfig) {
+      const root = document.documentElement
+      root.style.setProperty("--primary", colorConfig.hsl)
+    }
+  }
 
   const handleColorChange = (color: string) => {
     setPrimaryColor(color)
     localStorage.setItem("primaryColor", color)
-
-    // Apply color to CSS variables
-    const root = document.documentElement
-    const colorMap: Record<string, string> = {
-      blue: "221.2 83.2% 53.3%",
-      red: "0 84.2% 60.2%",
-      green: "142.1 76.2% 36.3%",
-      purple: "262.1 83.3% 57.8%",
-      orange: "24.6 95% 53.1%",
-    }
-
-    root.style.setProperty("--primary", colorMap[color])
+    applyColorToCSS(color)
 
     toast({
       title: "Color actualizado",
@@ -105,13 +106,37 @@ export default function SettingsPage() {
         description: "Se está generando el archivo PDF",
       })
 
-      setTimeout(() => {
+      // Fetch all workout data
+      const { data: workoutsData, error } = await supabase
+        .from("workouts")
+        .select(`
+        *,
+        exercises (*)
+      `)
+        .eq("user_id", DEFAULT_USER_ID)
+        .order("date", { ascending: true })
+
+      if (error) throw error
+
+      if (!workoutsData || workoutsData.length === 0) {
         toast({
-          title: "Exportación completada",
-          description: "Los datos se han exportado correctamente",
+          title: "Sin datos",
+          description: "No hay entrenamientos para exportar",
+          variant: "destructive",
         })
-      }, 2000)
+        return
+      }
+
+      // Generate PDF
+      const doc = generateWorkoutsPDF(workoutsData)
+      doc.save(`entrenamientos-completo-${new Date().toISOString().split("T")[0]}.pdf`)
+
+      toast({
+        title: "Exportación completada",
+        description: "El archivo PDF se ha descargado correctamente",
+      })
     } catch (error) {
+      console.error("Export error:", error)
       toast({
         title: "Error en la exportación",
         description: "No se pudo exportar los datos",
@@ -175,10 +200,49 @@ export default function SettingsPage() {
 
   if (!mounted) {
     return (
-      <div className="container mx-auto p-4 max-w-4xl">
-        <div className="animate-pulse space-y-4">
+      <div className="container mx-auto p-4 max-w-6xl">
+        <div className="animate-pulse space-y-6">
+          {/* Header skeleton */}
           <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="h-32 bg-muted rounded"></div>
+
+          {/* Tabs skeleton */}
+          <div className="flex space-x-1 bg-muted rounded-lg p-1">
+            <div className="w-24 h-8 bg-background rounded"></div>
+            <div className="w-16 h-8 bg-muted rounded"></div>
+            <div className="w-20 h-8 bg-muted rounded"></div>
+            <div className="w-12 h-8 bg-muted rounded"></div>
+          </div>
+
+          {/* Content skeleton */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 bg-muted rounded"></div>
+                <div className="w-24 h-6 bg-muted rounded"></div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Theme selection skeleton */}
+              <div>
+                <div className="w-12 h-4 bg-muted rounded mb-2"></div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="w-full h-10 bg-muted rounded"></div>
+                  <div className="w-full h-10 bg-muted rounded"></div>
+                  <div className="w-full h-10 bg-muted rounded"></div>
+                </div>
+              </div>
+
+              {/* Color selection skeleton */}
+              <div>
+                <div className="w-24 h-4 bg-muted rounded mb-2"></div>
+                <div className="grid grid-cols-5 gap-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="w-12 h-12 bg-muted rounded-full"></div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
@@ -192,14 +256,7 @@ export default function SettingsPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
           <TabsTrigger value="data">Datos</TabsTrigger>
-          <TabsTrigger value="exercises">
-            Ejer.
-            {exerciseStats.uniqueExercises > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                {exerciseStats.uniqueExercises}
-              </Badge>
-            )}
-          </TabsTrigger>
+          <TabsTrigger value="exercises">Ejercicios</TabsTrigger>
           <TabsTrigger value="info">Info</TabsTrigger>
         </TabsList>
 
@@ -222,7 +279,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme("light")}
                     className="justify-start"
                   >
-                    <Sun className="h-4 w-4" />
+                    <Sun className="h-4 w-4 " />
                     Claro
                   </Button>
                   <Button
@@ -230,7 +287,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme("dark")}
                     className="justify-start"
                   >
-                    <Moon className="h-4 w-4" />
+                    <Moon className="h-4 w-4 " />
                     Oscuro
                   </Button>
                   <Button
@@ -238,7 +295,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme("system")}
                     className="justify-start"
                   >
-                    <Monitor className="h-4 w-4" />
+                    <Monitor className="h-4 w-4 " />
                     Sys
                   </Button>
                 </div>
@@ -251,11 +308,12 @@ export default function SettingsPage() {
                   {COLORS.map((color) => (
                     <Button
                       key={color.value}
-                      variant={primaryColor === color.value ? "default" : "outline"}
+                      variant="ghost"
                       onClick={() => handleColorChange(color.value)}
-                      className={`${color.class} justify-start`}
-                    >
-                    </Button>
+                      className={`h-12 w-12 rounded-full p-0 ${color.class} ${primaryColor === color.value ? "ring-2 ring-offset-2 ring-primary" : ""
+                        }`}
+                      title={color.name}
+                    />
                   ))}
                 </div>
               </div>
@@ -278,7 +336,7 @@ export default function SettingsPage() {
                   </p>
                   <Button onClick={handleExport} className="w-full">
                     <Download className="h-4 w-4 mr-2" />
-                    Exportar a PDF
+                    Exportar PDF
                   </Button>
                 </div>
 
@@ -299,7 +357,7 @@ export default function SettingsPage() {
         <TabsContent value="exercises">
           <div className="space-y-6">
             {/* Exercise Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium">Ejercicios Únicos</CardTitle>
@@ -307,28 +365,6 @@ export default function SettingsPage() {
                 <CardContent>
                   <div className="text-2xl font-bold">{exerciseStats.uniqueExercises}</div>
                   <div className="text-xs text-muted-foreground">de {exerciseStats.totalExercises} totales</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">Por Tipo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>PUSH:</span>
-                      <span className="font-medium">{exerciseStats.sessionTypes.PUSH}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>PULL:</span>
-                      <span className="font-medium">{exerciseStats.sessionTypes.PULL}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>LEG:</span>
-                      <span className="font-medium">{exerciseStats.sessionTypes.LEG}</span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
 
@@ -349,6 +385,28 @@ export default function SettingsPage() {
                 <CardContent>
                   <div className="text-2xl font-bold">{filteredExercises.length}</div>
                   <div className="text-xs text-muted-foreground">mostrando</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Por Tipo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span>PUSH:</span>
+                      <span className="font-medium">{exerciseStats.sessionTypes.PUSH}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>PULL:</span>
+                      <span className="font-medium">{exerciseStats.sessionTypes.PULL}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>LEG:</span>
+                      <span className="font-medium">{exerciseStats.sessionTypes.LEG}</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -401,83 +459,137 @@ export default function SettingsPage() {
                   <Dumbbell className="h-5 w-5" />
                   Ejercicios Únicos (A-Z)
                 </CardTitle>
+                {(searchTerm || sessionFilter !== "all") && (
+                  <p className="text-sm text-muted-foreground">
+                    Mostrando {filteredExercises.length} de {exerciseStats.uniqueExercises} ejercicios
+                  </p>
+                )}
               </CardHeader>
               <CardContent>
                 {exercisesLoading ? (
                   <div className="space-y-3">
                     {[...Array(5)].map((_, i) => (
                       <div key={i} className="animate-pulse">
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-muted rounded-full"></div>
-                            <div className="space-y-1">
-                              <div className="w-32 h-4 bg-muted rounded"></div>
+                        <div className="flex flex-col md:flex-row md:items-center gap-3 p-3 border rounded-lg">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 bg-muted rounded-full"></div>
+                              <div className="w-3 h-3 bg-muted rounded-full"></div>
+                            </div>
+                            <div className="w-3 h-3 bg-muted rounded"></div>
+                            <div className="flex-1">
+                              <div className="w-32 h-4 bg-muted rounded mb-1"></div>
                               <div className="w-24 h-3 bg-muted rounded"></div>
                             </div>
                           </div>
-                          <div className="flex gap-1">
-                            <div className="w-8 h-8 bg-muted rounded"></div>
-                            <div className="w-8 h-8 bg-muted rounded"></div>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex gap-1">
+                              <div className="w-12 h-5 bg-muted rounded"></div>
+                              <div className="w-8 h-5 bg-muted rounded"></div>
+                            </div>
+                            <div className="flex gap-1">
+                              <div className="w-8 h-8 bg-muted rounded"></div>
+                              <div className="w-8 h-8 bg-muted rounded"></div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : filteredExercises.length > 0 ? (
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {filteredExercises.map((exercise) => (
                       <div
                         key={exercise.id}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                        className="flex flex-col md:flex-row md:items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="flex-column items-center gap-2">
-                            {exercise.sessionTypes.map((type) => (
+                        {/* Main content */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {/* Session type indicators */}
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            {exercise.sessionTypes.slice(0, 3).map((type, index) => (
                               <div
-                                key={type}
-                                className={`w-3 h-3 mb-1 mt-1 rounded-full ${SESSION_TYPE_COLORS[type as keyof typeof SESSION_TYPE_COLORS]}`}
+                                key={`${type}-${index}`}
+                                className={`w-3 h-3 rounded-full ${SESSION_TYPE_COLORS[type as keyof typeof SESSION_TYPE_COLORS]}`}
+                                title={type}
                               />
                             ))}
+                            {exercise.sessionTypes.length > 3 && (
+                              <span className="text-xs text-muted-foreground">+{exercise.sessionTypes.length - 3}</span>
+                            )}
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium">{exercise.name}</div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-3">
-                              <span>
+
+                          {/* Superset indicator */}
+                          {exercise.is_linked_to_previous && <Zap className="h-3 w-3 text-orange-500 flex-shrink-0" />}
+
+                          {/* Exercise info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">{exercise.name}</div>
+
+                            {/* Mobile: Stack info vertically */}
+                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-sm text-muted-foreground">
+                              <span className="truncate">
                                 {exercise.sets} • {exercise.weights}
                               </span>
-                              <div className="flex items-center gap-1">
-                                <TrendingUp className="h-3 w-3" />
-                                <span>{exercise.frequency}x usado</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                <span>
-                                  {new Date(exercise.lastUsed).toLocaleDateString("es-ES", {
-                                    day: "numeric",
-                                    month: "short",
-                                  })}
-                                </span>
+                              <div className="flex items-center gap-3 text-xs">
+                                <div className="flex items-center gap-1">
+                                  <TrendingUp className="h-3 w-3 flex-shrink-0" />
+                                  <span>{exercise.frequency}x</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3 flex-shrink-0" />
+                                  <span>
+                                    {new Date(exercise.lastUsed).toLocaleDateString("es-ES", {
+                                      day: "numeric",
+                                      month: "short",
+                                    })}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-1 ml-4">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditExercise(exercise)}
-                            className="h-8 w-8"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteExercise(exercise.id, exercise.name)}
-                            className="h-8 w-8"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+
+                        {/* Badges and actions */}
+                        <div className="flex items-center justify-between md:justify-end gap-2 flex-shrink-0">
+                          {/* Badges - responsive */}
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {exercise.sessionTypes.slice(0, 2).map((type) => (
+                              <Badge key={type} variant="outline" className="text-xs">
+                                {type}
+                              </Badge>
+                            ))}
+                            {exercise.sessionTypes.length > 2 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{exercise.sessionTypes.length - 2}
+                              </Badge>
+                            )}
+                            {exercise.is_linked_to_previous && (
+                              <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
+                                SS
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Action buttons */}
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditExercise(exercise)}
+                              className="h-8 w-8 flex-shrink-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteExercise(exercise.id, exercise.name)}
+                              className="h-8 w-8 flex-shrink-0"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -508,7 +620,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Versión:</span>
-                  <span>1.0.1</span>
+                  <span>1.0.3</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Última actualización:</span>

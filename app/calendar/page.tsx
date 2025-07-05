@@ -106,13 +106,122 @@ export default function CalendarPage() {
     return (
       <div className="container mx-auto p-4 max-w-6xl">
         <div className="animate-pulse space-y-6">
+          {/* Header skeleton */}
           <div className="h-8 bg-muted rounded w-1/3"></div>
+
+          {/* Stats cards skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-24 bg-muted rounded"></div>
+              <Card key={i} className="animate-pulse">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-muted rounded"></div>
+                    <div className="w-24 h-4 bg-muted rounded"></div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="w-8 h-8 bg-muted rounded mb-2"></div>
+                  <div className="w-16 h-3 bg-muted rounded"></div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-          <div className="h-96 bg-muted rounded"></div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Calendar skeleton */}
+            <div className="lg:col-span-2">
+              <Card className="animate-pulse">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 bg-muted rounded"></div>
+                    <div className="w-32 h-6 bg-muted rounded"></div>
+                    <div className="w-8 h-8 bg-muted rounded"></div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {/* Days header skeleton */}
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {[...Array(7)].map((_, i) => (
+                      <div key={i} className="w-8 h-4 bg-muted rounded"></div>
+                    ))}
+                  </div>
+                  {/* Calendar grid skeleton */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {[...Array(35)].map((_, i) => (
+                      <div key={i} className="aspect-square">
+                        <div className="w-full h-full bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Legend skeleton */}
+                  <div className="flex items-center justify-center gap-4 mt-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-muted rounded-full"></div>
+                        <div className="w-8 h-3 bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar skeleton */}
+            <div className="space-y-6">
+              {/* Month summary skeleton */}
+              <Card className="animate-pulse">
+                <CardHeader>
+                  <div className="w-24 h-5 bg-muted rounded"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="flex justify-between">
+                        <div className="w-20 h-4 bg-muted rounded"></div>
+                        <div className="w-8 h-4 bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent workouts skeleton */}
+              <Card className="animate-pulse">
+                <CardHeader>
+                  <div className="w-32 h-5 bg-muted rounded"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-3 h-3 bg-muted rounded-full"></div>
+                          <div className="space-y-1">
+                            <div className="w-16 h-4 bg-muted rounded"></div>
+                            <div className="w-24 h-3 bg-muted rounded"></div>
+                          </div>
+                        </div>
+                        <div className="w-12 h-5 bg-muted rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick actions skeleton */}
+              <Card className="animate-pulse">
+                <CardHeader>
+                  <div className="w-24 h-5 bg-muted rounded"></div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="w-full h-10 bg-muted rounded"></div>
+                    <div className="w-full h-10 bg-muted rounded"></div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -136,12 +245,12 @@ export default function CalendarPage() {
 
       {/* Stats Cards */}
       {calendarStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4" />
-                Entrenamientos
+                Total Entrenamientos
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -180,7 +289,7 @@ export default function CalendarPage() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Promedio
+                Promedio Semanal
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -234,7 +343,7 @@ export default function CalendarPage() {
                       >
                         <span className="text-sm font-medium">{day}</span>
                         {getWorkoutForDay(day) && (
-                          <div className="flex items-center gap-1 mt-1">
+                          <div className="flex items-center gap-1">
                             <div
                               className={cn(
                                 "w-2 h-2 rounded-full",
@@ -252,7 +361,7 @@ export default function CalendarPage() {
               {/* Legend */}
               <div className="flex flex-wrap items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full border-primary border-2"></div>
+                  <div className="w-3 h-3 border-primary border-2 rounded-full"></div>
                   <span>Hoy</span>
                 </div>
                 <div className="flex items-center gap-2">

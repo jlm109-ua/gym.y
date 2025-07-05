@@ -1,0 +1,25 @@
+// Función para limpiar texto con acentos para LaTeX
+export function cleanTextForLatex(text: string): string {
+    return text
+        .replace(/á/g, "\\'a")
+        .replace(/é/g, "\\'e")
+        .replace(/í/g, "\\'i")
+        .replace(/ó/g, "\\'o")
+        .replace(/ú/g, "\\'u")
+        .replace(/ñ/g, "\\~n")
+        .replace(/Á/g, "\\'A")
+        .replace(/É/g, "\\'E")
+        .replace(/Í/g, "\\'I")
+        .replace(/Ó/g, "\\'O")
+        .replace(/Ú/g, "\\'U")
+        .replace(/Ñ/g, "\\~N")
+        .replace(/ü/g, '\\"u')
+        .replace(/Ü/g, '\\"U')
+        .replace(/_/g, "\\_")
+        .replace(/%/g, "\\%")
+        .replace(/&/g, "\\&")
+        .replace(/#/g, "\\#")
+        .replace(/\$/g, "\\$")
+        .replace(/\{/g, "\\{")
+        .replace(/\}/g, "\\}")
+}

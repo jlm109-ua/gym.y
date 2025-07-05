@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, DEFAULT_USER_ID } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
+import { DEFAULT_USER_ID } from "@/lib/constants"
 import { useToast } from "@/hooks/use-toast"
 
 interface WorkoutDay {

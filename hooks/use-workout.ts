@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, DEFAULT_USER_ID } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
+import { DEFAULT_USER_ID } from "@/lib/constants"
 import { useToast } from "@/hooks/use-toast"
 
 interface Workout {
@@ -20,7 +21,7 @@ interface Exercise {
   weights: string
   notes?: string
   position: number
-  is_linked_to_previous: boolean // ✅ Añadir este campo
+  is_linked_to_previous: boolean
 }
 
 export function useWorkout(date: string) {
@@ -54,7 +55,7 @@ export function useWorkout(date: string) {
       if (workoutData) {
         const { data: exercises, error: exercisesError } = await supabase
           .from("exercises")
-          .select("id, workout_id, name, sets, weights, notes, position, is_linked_to_previous, created_at") // ✅ Incluir is_linked_to_previous
+          .select("id, workout_id, name, sets, weights, notes, position, is_linked_to_previous, created_at")
           .eq("workout_id", workoutData.id)
           .order("position", { ascending: true })
 

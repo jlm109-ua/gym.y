@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase, DEFAULT_USER_ID } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
+import { DEFAULT_USER_ID } from "@/lib/constants"
 import { useToast } from "@/hooks/use-toast"
 
 interface ExerciseWithWorkout {
@@ -69,13 +70,12 @@ export function useAllExercises() {
                 throw exercisesError
             }
 
-            const allExercises = (exercisesData || []).map((exercise: any) => {
-                // If workout is an array, take the first element
-                if (Array.isArray(exercise.workout)) {
-                    return { ...exercise, workout: exercise.workout[0] }
-                }
-                return exercise
-            })
+            const allExercises =
+                (exercisesData || []).map((exercise: any) => ({
+                    ...exercise,
+                    // If workout is an array, take the first element
+                    workout: Array.isArray(exercise.workout) ? exercise.workout[0] : exercise.workout,
+                }))
             setExercises(allExercises)
 
             // Process unique exercises

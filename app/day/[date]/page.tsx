@@ -308,6 +308,7 @@ export default function DayPage() {
             <div className="w-16 h-6 bg-muted rounded animate-pulse"></div>
             <div className="w-20 h-6 bg-muted rounded animate-pulse"></div>
             <div className="w-24 h-6 bg-muted rounded animate-pulse"></div>
+            <div className="w-8 h-6 bg-muted rounded animate-pulse"></div>
           </div>
         </div>
         <div className="w-8 h-8 bg-muted rounded animate-pulse"></div>
@@ -315,13 +316,15 @@ export default function DayPage() {
 
       {/* Exercise cards skeleton */}
       <div className="space-y-4">
-        {[...Array(3)].map((_, index) => (
+        {[...Array(4)].map((_, index) => (
           <Card key={index} className="animate-pulse">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-muted rounded"></div>
+                  <div className="w-4 h-4 bg-muted rounded"></div>
                   <div className="w-32 h-6 bg-muted rounded"></div>
+                  <div className="w-16 h-5 bg-muted rounded"></div>
                 </div>
                 <div className="flex gap-1">
                   <div className="w-8 h-8 bg-muted rounded"></div>
@@ -350,6 +353,16 @@ export default function DayPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Superseries info skeleton */}
+      <div className="mt-6 p-4 bg-muted/20 border rounded-lg animate-pulse">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-4 h-4 bg-muted rounded"></div>
+          <div className="w-32 h-4 bg-muted rounded"></div>
+        </div>
+        <div className="w-full h-3 bg-muted rounded"></div>
+        <div className="w-3/4 h-3 bg-muted rounded mt-1"></div>
       </div>
 
       {/* Floating button skeleton */}
