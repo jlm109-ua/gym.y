@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Calendar, BarChart3, TrendingUp, Settings, Dumbbell } from "lucide-react"
+import { Brain, Calendar, BarChart3, TrendingUp, Settings, Dumbbell } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { href: "/calendar", label: "Calendario", icon: Calendar },
   { href: "/stats", label: "Estadísticas", icon: BarChart3 },
   { href: "/progress", label: "Progreso", icon: TrendingUp },
+  { href: "/wellness", label: "Bienestar", icon: Brain },
   { href: "/settings", label: "Ajustes", icon: Settings },
 ]
 
