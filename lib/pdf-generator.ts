@@ -261,7 +261,7 @@ export function generateStatsPDF(exerciseStats: any[], sessionStats: any) {
     doc.line(20, yPos, 190, yPos)
     yPos += 8
 
-    exerciseStats.slice(0, 20).forEach((stat) => {
+    exerciseStats.forEach((stat) => {
         if (yPos > 270) {
             doc.addPage()
             yPos = 30
