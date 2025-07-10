@@ -242,14 +242,7 @@ export default function SettingsPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
           <TabsTrigger value="data">Datos</TabsTrigger>
-          <TabsTrigger value="exercises">
-            Ejercicios
-            {exerciseStats.uniqueExercises > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                {exerciseStats.uniqueExercises}
-              </Badge>
-            )}
-          </TabsTrigger>
+          <TabsTrigger value="exercises">Ejercicios</TabsTrigger>
           <TabsTrigger value="info">Info</TabsTrigger>
         </TabsList>
 
