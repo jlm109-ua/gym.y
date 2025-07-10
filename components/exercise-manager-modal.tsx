@@ -135,34 +135,30 @@ export function ExerciseManagerModal({ open, onOpenChange, exercise, onSuccess }
                         </div>
                         <div>
                             <Label htmlFor="repetitions">Repeticiones</Label>
-                            <Select value={isFailure ? "failure" : repetitions} onValueChange={handleRepetitionsChange}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Seleccionar..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="failure">Al Fallo</SelectItem>
-                                    <SelectItem value="6">6 reps</SelectItem>
-                                    <SelectItem value="8">8 reps</SelectItem>
-                                    <SelectItem value="10">10 reps</SelectItem>
-                                    <SelectItem value="12">12 reps</SelectItem>
-                                    <SelectItem value="15">15 reps</SelectItem>
-                                    <SelectItem value="20">20 reps</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {!isFailure && (
+                            <div className="flex items-center gap-2">
                                 <Input
+                                    id="repetitions"
                                     type="number"
                                     min="1"
-                                    value={repetitions}
-                                    onChange={(e) => setRepetitions(e.target.value)}
-                                    placeholder="O escribe número..."
-                                    className="mt-2"
+                                    value={isFailure ? "" : repetitions}
+                                    onChange={(e) => {
+                                        setIsFailure(false)
+                                        setRepetitions(e.target.value)
+                                    }}
+                                    placeholder="Ej: 8"
+                                    disabled={isFailure}
                                 />
-                            )}
-                            <div className="text-right mt-1">
-                                <span className="text-sm text-muted-foreground">
-                                    {series || "0"}x{isFailure ? "Al Fallo" : repetitions || "0"}
-                                </span>
+                                <label className="flex items-center text-sm gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={isFailure}
+                                        onChange={(e) => {
+                                            setIsFailure(e.target.checked)
+                                            if (e.target.checked) setRepetitions("")
+                                        }}
+                                    />
+                                    Al fallo
+                                </label>
                             </div>
                         </div>
                     </div>

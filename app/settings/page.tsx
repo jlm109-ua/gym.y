@@ -625,31 +625,31 @@ function ExerciseEditForm({ exercise, onSave, onCancel }: any) {
         </div>
         <div>
           <Label>Repeticiones</Label>
-          <Select
-            value={isFailure ? "failure" : repetitions}
-            onValueChange={(value) => {
-              if (value === "failure") {
-                setIsFailure(true)
-                setRepetitions("")
-              } else {
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              min="1"
+              value={isFailure ? "" : repetitions}
+              onChange={(e) => {
+                const value = e.target.value
                 setIsFailure(false)
                 setRepetitions(value)
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="failure">Al Fallo</SelectItem>
-              <SelectItem value="6">6</SelectItem>
-              <SelectItem value="8">8</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="12">12</SelectItem>
-              <SelectItem value="15">15</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-            </SelectContent>
-          </Select>
+              }}
+              placeholder="Ej: 8"
+              disabled={isFailure}
+            />
+            <label className="flex items-center text-sm gap-2">
+              <input
+                type="checkbox"
+                checked={isFailure}
+                onChange={(e) => {
+                  setIsFailure(e.target.checked)
+                  if (e.target.checked) setRepetitions("")
+                }}
+              />
+              Al fallo
+            </label>
+          </div>
         </div>
       </div>
 
