@@ -14,7 +14,7 @@ interface ExerciseManagerModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     exercise?: any
-    onSuccess: () => void
+    onSuccess: (instanceData: any) => void | Promise<void>
 }
 
 export function ExerciseManagerModal({ open, onOpenChange, exercise, onSuccess }: ExerciseManagerModalProps) {
@@ -90,7 +90,7 @@ export function ExerciseManagerModal({ open, onOpenChange, exercise, onSuccess }
             }
 
             // This will be handled by the parent component
-            onSuccess()
+            onSuccess(exerciseData)
         } catch (error) {
             console.error("Error saving exercise:", error)
         } finally {

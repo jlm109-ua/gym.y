@@ -11,28 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useTheme } from "next-themes"
-import {
-  Download,
-  Upload,
-  Palette,
-  Moon,
-  Sun,
-  Monitor,
-  Dumbbell,
-  Search,
-  Edit,
-  Trash2,
-  Zap,
-  Filter,
-  TrendingUp,
-  Clock,
-} from "lucide-react"
+import { Download, Upload, Palette, Moon, Sun, Monitor, Dumbbell, Search, Filter } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ImportModal } from "@/components/import-modal"
 import { useAllExercises } from "@/hooks/use-all-exercises"
 import { supabase } from "@/lib/supabase"
 import { DEFAULT_USER_ID } from "@/lib/constants"
 import { generateWorkoutsPDF } from "@/lib/pdf-generator"
+import { ExerciseAccordion } from "@/components/exercise-accordion"
 
 const COLORS = [
   { name: "Azul", value: "blue", class: "bg-blue-500", hsl: "221.2 83.2% 53.3%" },
@@ -256,7 +242,14 @@ export default function SettingsPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
           <TabsTrigger value="data">Datos</TabsTrigger>
-          <TabsTrigger value="exercises">Ejercicios</TabsTrigger>
+          <TabsTrigger value="exercises">
+            Ejercicios
+            {exerciseStats.uniqueExercises > 0 && (
+              <Badge variant="secondary" className="ml-1 text-xs">
+                {exerciseStats.uniqueExercises}
+              </Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="info">Info</TabsTrigger>
         </TabsList>
 
@@ -279,7 +272,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme("light")}
                     className="justify-start"
                   >
-                    <Sun className="h-4 w-4 " />
+                    <Sun className="h-4 w-4 mr-2" />
                     Claro
                   </Button>
                   <Button
@@ -287,7 +280,7 @@ export default function SettingsPage() {
                     onClick={() => setTheme("dark")}
                     className="justify-start"
                   >
-                    <Moon className="h-4 w-4 " />
+                    <Moon className="h-4 w-4 mr-2" />
                     Oscuro
                   </Button>
                   <Button
@@ -295,8 +288,8 @@ export default function SettingsPage() {
                     onClick={() => setTheme("system")}
                     className="justify-start"
                   >
-                    <Monitor className="h-4 w-4 " />
-                    Sys
+                    <Monitor className="h-4 w-4 mr-2" />
+                    Sistema
                   </Button>
                 </div>
               </div>
@@ -499,99 +492,12 @@ export default function SettingsPage() {
                 ) : filteredExercises.length > 0 ? (
                   <div className="space-y-3 max-h-96 overflow-y-auto">
                     {filteredExercises.map((exercise) => (
-                      <div
+                      <ExerciseAccordion
                         key={exercise.id}
-                        className="flex flex-col md:flex-row md:items-center gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        {/* Main content */}
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {/* Session type indicators */}
-                          <div className="flex items-center gap-1 flex-shrink-0">
-                            {exercise.sessionTypes.slice(0, 3).map((type, index) => (
-                              <div
-                                key={`${type}-${index}`}
-                                className={`w-3 h-3 rounded-full ${SESSION_TYPE_COLORS[type as keyof typeof SESSION_TYPE_COLORS]}`}
-                                title={type}
-                              />
-                            ))}
-                            {exercise.sessionTypes.length > 3 && (
-                              <span className="text-xs text-muted-foreground">+{exercise.sessionTypes.length - 3}</span>
-                            )}
-                          </div>
-
-                          {/* Superset indicator */}
-                          {exercise.is_linked_to_previous && <Zap className="h-3 w-3 text-orange-500 flex-shrink-0" />}
-
-                          {/* Exercise info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{exercise.name}</div>
-
-                            {/* Mobile: Stack info vertically */}
-                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-sm text-muted-foreground">
-                              <span className="truncate">
-                                {exercise.sets} • {exercise.weights}
-                              </span>
-                              <div className="flex items-center gap-3 text-xs">
-                                <div className="flex items-center gap-1">
-                                  <TrendingUp className="h-3 w-3 flex-shrink-0" />
-                                  <span>{exercise.frequency}x</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3 flex-shrink-0" />
-                                  <span>
-                                    {new Date(exercise.lastUsed).toLocaleDateString("es-ES", {
-                                      day: "numeric",
-                                      month: "short",
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Badges and actions */}
-                        <div className="flex items-center justify-between md:justify-end gap-2 flex-shrink-0">
-                          {/* Badges - responsive */}
-                          <div className="flex items-center gap-1 flex-wrap">
-                            {exercise.sessionTypes.slice(0, 2).map((type) => (
-                              <Badge key={type} variant="outline" className="text-xs">
-                                {type}
-                              </Badge>
-                            ))}
-                            {exercise.sessionTypes.length > 2 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{exercise.sessionTypes.length - 2}
-                              </Badge>
-                            )}
-                            {exercise.is_linked_to_previous && (
-                              <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
-                                SS
-                              </Badge>
-                            )}
-                          </div>
-
-                          {/* Action buttons */}
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEditExercise(exercise)}
-                              className="h-8 w-8 flex-shrink-0"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteExercise(exercise.id, exercise.name)}
-                              className="h-8 w-8 flex-shrink-0"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
+                        exercise={exercise}
+                        onUpdateExercise={updateExercise}
+                        onDeleteExercise={deleteExercise}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -624,7 +530,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Última actualización:</span>
-                  <span>Julio 2025</span>
+                  <span>Enero 2025</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Desarrollado con:</span>
